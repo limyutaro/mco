@@ -1,3 +1,3 @@
 # Monomial, Convex Bodies, and Optimization
 
-Summer 2020, Polymath REU.
+Rational powers, Summer 2020, Polymath REU.
