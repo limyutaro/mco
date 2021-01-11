@@ -1,5 +1,5 @@
--- Lego algorithm
--- program that improves on the hyperrectangle (naive) algorithm by converting for loops to while loops
+-- improved hyperrectangle algorithm
+-- program that improves on the hyperrectangle (naive) algorithm by swapping for-loops to while-loops
 -- V1 AUG 12 10:58 
 
 
