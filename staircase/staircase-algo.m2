@@ -6,7 +6,7 @@
 -- I = ideal(w*z, w*x, x^5);
 -- r = 8/5;
 
--- rPowerHS(I,r)
+-- rPowerStaircase(I,r)
 
 
 --------------------------------------------------------------------------------
@@ -14,7 +14,7 @@
 loadPackage ("Polyhedra", Reload => true);
 
 --------------------------------------------------------------------------------
-getExtremeValuesHS = (I, r) ->
+getExtremeValuesStaircase = (I, r) ->
 (
   generatorArray := apply(apply(flatten entries gens I, exponents), flatten);
 
@@ -52,7 +52,7 @@ getExtremeValuesHS = (I, r) ->
 );
 
 --------------------------------------------------------------------------------
-NpolyhedronHS = I ->
+NpolyhedronStaircase = I ->
 (
   C := posHull id_(ZZ^(dim ring I));
 
@@ -61,10 +61,10 @@ NpolyhedronHS = I ->
   return NP
 );
 --------------------------------------------------------------------------------
-getHalfSpacesHS = (I, r) ->
+getHalfSpacesStaircase = (I, r) ->
 (
   -- Get NP(I)
-  N := NpolyhedronHS I; 
+  N := NpolyhedronStaircase I; 
 
   -- Get halfspace inequalities
   hspaces := halfspaces N;
@@ -86,7 +86,7 @@ getHalfSpacesHS = (I, r) ->
   return hspaces
 );
 --------------------------------------------------------------------------------
-checkInPolyhedronHS = (point, hspaces) ->
+checkInPolyhedronStaircase = (point, hspaces) ->
 (
   matrixCoords := transpose matrix{point}; -- convert point to a matrix x
   result := hspaces_0 * matrixCoords; -- compute Ax 
@@ -104,7 +104,7 @@ checkInPolyhedronHS = (point, hspaces) ->
   return satisfiesIneql
 );
 --------------------------------------------------------------------------------
-cascadeHS = (point, varNum, minVals, maxVals, hspaces) -> 
+cascadeStaircase = (point, varNum, minVals, maxVals, hspaces) -> 
 (
   generatorsList := {};
   n := numgens(R) - 1;
@@ -113,16 +113,16 @@ cascadeHS = (point, varNum, minVals, maxVals, hspaces) ->
     for i from minVals_varNum to maxVals_varNum do(
       newpoint := replace(varNum, i, point);
 
-      generatorsList = generatorsList | cascadeHS(newpoint, varNum + 1, minVals, maxVals, hspaces)
+      generatorsList = generatorsList | cascadeStaircase(newpoint, varNum + 1, minVals, maxVals, hspaces)
     )
   ) else if varNum == n - 1 then (
-    generatorsList = generatorsList | staircaseHS(point, varNum, minVals, maxVals, hspaces)
+    generatorsList = generatorsList | staircaseStaircase(point, varNum, minVals, maxVals, hspaces)
   );
 
   return generatorsList
 );
 --------------------------------------------------------------------------------
-staircaseHS = (currPoint, varNum, minVals, maxVals, hspaces) -> (
+staircaseStaircase = (currPoint, varNum, minVals, maxVals, hspaces) -> (
   --todo trim hspaces to essential inequalities here
   print("\nnew staircase");
 
@@ -142,7 +142,7 @@ staircaseHS = (currPoint, varNum, minVals, maxVals, hspaces) -> (
   -- performs 2-d staircase until we arrive at the maximum value for the last coordinate
   while withinHyperrect do (
     
-    inPolyhedron := checkInPolyhedronHS(currPoint, hspaces);
+    inPolyhedron := checkInPolyhedronStaircase(currPoint, hspaces);
     topLeft := currPoint_y == maxY and not inPolyhedron;
 
     if topLeft then ( -- point is outside but topleft
@@ -179,7 +179,7 @@ staircaseHS = (currPoint, varNum, minVals, maxVals, hspaces) -> (
   return gensArray
 )
 --------------------------------------------------------------------------------
-makeIdealHS = (gensArray) -> (
+makeIdealStaircase = (gensArray) -> (
   monomialGens := {};
 
   -- loop through each generator and variable
@@ -201,9 +201,9 @@ makeIdealHS = (gensArray) -> (
 );
 --------------------------------------------------------------------------------
 
-rPower = (I,r) -> (
+rPowerStaircase = (I,r) -> (
 
-  extremes := getExtremeValuesHS(I,r);
+  extremes := getExtremeValuesStaircase(I,r);
   minVals := extremes_0;
   maxVals := extremes_1;
 
@@ -211,11 +211,11 @@ rPower = (I,r) -> (
   n := numgens(R) - 1;
   startPoint := replace(n, maxVals_n, minVals);
 
-  hspaces := getHalfSpacesHS(I, r);
+  hspaces := getHalfSpacesStaircase(I, r);
 
-  minGens := cascadeHS(startPoint, 0, minVals, maxVals, hspaces);
+  minGens := cascadeStaircase(startPoint, 0, minVals, maxVals, hspaces);
 
-  return makeIdealHS(minGens)
+  return makeIdealStaircase(minGens)
 );
 
 --------------------------------------------------------------------------------
